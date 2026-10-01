@@ -1,0 +1,17 @@
+services:
+  lab:
+    build:
+      context: ./lab
+      dockerfile: Dockerfile
+    image: paint2d-lab:latest
+    container_name: paint2d-lab
+    ports:
+      # Bound to loopback on purpose: this application is intentionally vulnerable.
+      # Change to "8080:8080" only if you understand the exposure.
+      - "127.0.0.1:8080:8080"
+    environment:
+      TZ: UTC
+    restart: unless-stopped
+    # The container drops to an unprivileged uid 1003 account itself.
+    security_opt:
+      - no-new-privileges:true

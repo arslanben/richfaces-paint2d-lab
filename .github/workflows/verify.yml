@@ -1,0 +1,43 @@
+name: build-and-verify
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build the lab image
+        run: docker compose build
+
+      - name: Start the lab
+        run: |
+          docker compose up -d
+          # the container healthcheck needs a moment; poll instead of sleeping blindly
+          for i in $(seq 1 30); do
+            if curl -fsS http://127.0.0.1:8080/ETOPUPGUI/lab/health >/dev/null 2>&1; then
+              echo "lab is up"
+              exit 0
+            fi
+            sleep 2
+          done
+          echo "lab did not become healthy" >&2
+          docker compose logs
+          exit 1
+
+      - name: Verify the exploit chain end to end
+        run: ./tools/verify.sh http://127.0.0.1:8080
+
+      - name: Container logs on failure
+        if: failure()
+        run: docker compose logs --tail=200
+
+      - name: Tear down
+        if: always()
+        run: docker compose down -v

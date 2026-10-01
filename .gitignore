@@ -1,0 +1,21 @@
+# build output
+lab/target/
+*.class
+*.war
+*.jar
+
+# python
+__pycache__/
+*.py[cod]
+
+# local scratch
+*.log
+.DS_Store
+.idea/
+.vscode/
+
+# scratch files the walkthrough writes while you patch the blob by hand
+# (docs/WALKTHROUGH.md step 2 — fetched blob, inflated stream, re-encoded payload)
+blob.txt
+stream.bin
+payload.txt

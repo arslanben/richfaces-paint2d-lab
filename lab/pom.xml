@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>lab</groupId>
+  <artifactId>richfaces-paint2d-lab</artifactId>
+  <version>1.0.0</version>
+  <packaging>war</packaging>
+  <name>RichFaces Paint2DResource Lab</name>
+  <description>
+    Intentionally vulnerable reproduction of CVE-2018-12533 (RichFaces Paint2DResource
+    EL injection) as a self-contained CTF lab. Never deploy this outside a lab.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>17</maven.compiler.source>
+    <maven.compiler.target>17</maven.compiler.target>
+    <tomcat.version>9.0.85</tomcat.version>
+    <spring.version>5.3.39</spring.version>
+  </properties>
+
+  <dependencies>
+    <!-- Servlet API: provided by the container. -->
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>javax.servlet-api</artifactId>
+      <version>4.0.1</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
+      EL 3.0 API + implementation. Tomcat ships these in $CATALINA_HOME/lib
+      (el-api.jar / jasper-el.jar), so they are provided rather than bundled.
+      Using the same javax.el 3.0 line as the JSF/RichFaces era keeps the EL semantics
+      (method invocation on beans, Map property access) identical to the original.
+    -->
+    <dependency>
+      <groupId>org.apache.tomcat</groupId>
+      <artifactId>tomcat-el-api</artifactId>
+      <version>${tomcat.version}</version>
+      <scope>provided</scope>
+    </dependency>
+
+    <!--
+      SpEL. Bundled on purpose: it represents a normal application dependency that
+      happened to be on the classpath of the target application, which is what turned
+      EL injection into command execution in the original report.
+    -->
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-expression</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-core</artifactId>
+      <version>${spring.version}</version>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <finalName>ROOT</finalName>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-compiler-plugin</artifactId>
+        <version>3.13.0</version>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-war-plugin</artifactId>
+        <version>3.4.0</version>
+        <configuration>
+          <failOnMissingWebXml>false</failOnMissingWebXml>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+</project>

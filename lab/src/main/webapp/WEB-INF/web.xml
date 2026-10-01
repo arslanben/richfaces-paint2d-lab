@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns="http://xmlns.jcp.org/xml/ns/javaee"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
+                             http://xmlns.jcp.org/xml/ns/javaee/web-app_4_0.xsd"
+         version="4.0">
+
+  <display-name>TopUp Console (RichFaces Paint2DResource Lab)</display-name>
+
+  <!--
+    WARNING: intentionally vulnerable application.
+
+    Paint2DResourceServlet deserializes a client-supplied RichFactors blob with an
+    unfiltered ObjectInputStream and then evaluates the EL string it finds inside
+    (CVE-2018-12533). Do not expose this outside an isolated lab network.
+  -->
+
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>lab.web.LoginServlet</servlet-class>
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/pages/login.jsf</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>TopUpServlet</servlet-name>
+    <servlet-class>lab.web.TopUpServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>TopUpServlet</servlet-name>
+    <url-pattern>/pages/topup.jsf</url-pattern>
+  </servlet-mapping>
+
+  <!--
+    The sink. The path mirrors the RichFaces 3.3.3 resource URL that the PoC replays:
+    /a4j/s/3_3_3.Finalorg.richfaces.renderkit.html.Paint2DResource/DATA/<blob>.jsf
+  -->
+  <servlet>
+    <servlet-name>Paint2DResourceServlet</servlet-name>
+    <servlet-class>lab.web.Paint2DResourceServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>Paint2DResourceServlet</servlet-name>
+    <url-pattern>/a4j/s/*</url-pattern>
+  </servlet-mapping>
+
+  <servlet>
+    <servlet-name>LabServlet</servlet-name>
+    <servlet-class>lab.web.LabServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>LabServlet</servlet-name>
+    <url-pattern>/lab/*</url-pattern>
+  </servlet-mapping>
+
+  <session-config>
+    <session-timeout>60</session-timeout>
+    <cookie-config>
+      <http-only>true</http-only>
+    </cookie-config>
+    <tracking-mode>COOKIE</tracking-mode>
+  </session-config>
+
+</web-app>
