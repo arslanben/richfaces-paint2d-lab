@@ -31,8 +31,11 @@ jobs:
           docker compose logs
           exit 1
 
+      # Invoked through `bash` rather than as ./tools/verify.sh: git does not always
+      # preserve the executable bit across clones and filesystems, and a lost mode
+      # should never be what turns this check red.
       - name: Verify the exploit chain end to end
-        run: ./tools/verify.sh http://127.0.0.1:8080
+        run: bash tools/verify.sh http://127.0.0.1:8080
 
       - name: Container logs on failure
         if: failure()
